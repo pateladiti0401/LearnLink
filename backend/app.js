@@ -5,7 +5,9 @@ const authRoutes = require('./routes/authRoutes');
 const cookieParser = require('cookie-parser');
 const { requireAuth, checkUser } = require('./middleware/authMiddleware');
 const labRoutes = require('./routes/labRoutes');
+const githubRoutes = require('./routes/githubRoutes');
 require('dotenv').config();
+
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -49,5 +51,6 @@ app.get('*', checkUser);
 app.get('/', (req, res) => res.render('home'));
 app.use(authRoutes);
 app.use(labRoutes)
+app.use('/api', githubRoutes);
 
 module.exports = app;

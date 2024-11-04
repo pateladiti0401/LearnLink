@@ -12,6 +12,7 @@ const router = Router();
 router.get('/api/labs',  labController.getAllLabs);
 router.get('/api/labs/:repo', labController.getLabByRepo);
 
+
 module.exports = router;
 
 
