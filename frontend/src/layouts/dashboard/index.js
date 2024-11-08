@@ -20,6 +20,8 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import coverImage from "../../assets/images/bg-reset-cover.jpeg";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
@@ -27,28 +29,28 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchReports = async () => {
-  //     try {
-  //       const response = await axios.get("https://api.example.com/reports"); // Replace with your API endpoint
-  //       setReports(response.data); // Adjust according to your API response structure
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/labs");
+        setReports(response.data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchReports();
-  // }, []);
+    fetchReports();
+  }, []);
 
-  // if (loading) {
-  //   return <div>Loading...</div>; // You can add a loader or spinner here
-  // }
+  if (loading) {
+    // return <div>Loading...</div>; // You can add a loader or spinner here
+  }
 
-  // if (error) {
-  //   return <div>Error: {error}</div>; // Display error if fetching fails
-  // }
+  if (error) {
+    return <div>Error: {error}</div>; // Display error if fetching fails
+  }
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -116,54 +118,39 @@ function Dashboard() {
         </Grid>
         <MDBox mt={4.5}>
           <Grid container spacing={3}>
-            {reports.map((report) => (
-              <ReportsBarChart
-                key={report.id} // Use a unique key from your data
-                color={report.color || "info"} // Optional color field, adjust as necessary
-                title={report.title} // Assuming report has title field
-                description={report.description} // Assuming report has description field
-                date={report.date} // Assuming report has date field
-                chart={report.chart} // Assuming report has chart data
-              />
+            {reports.slice(0, 3).map((report) => (
+              <Grid item xs={12} md={6} lg={4} key={report.url}>
+                <Link to={`/labs/${report.name}`} style={{ textDecoration: "none" }}>
+                  <ReportsBarChart
+                    image={coverImage} // Image path
+                    title={report.name}
+                    description={report.description}
+                    chart={reportsBarChartData}
+                    imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
+                  />
+                </Link>
+              </Grid>
             ))}
-            {/* <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsBarChart
-                  color="info"
-                  title="website views"
-                  description="Last Campaign Performance"
-                  date="campaign sent 2 days ago"
-                  chart={reportsBarChartData}
-                />
-              </MDBox>
-            </Grid> */}
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="success"
-                  title="daily sales"
-                  description={
-                    <>
-                      (<strong>+15%</strong>) increase in today sales.
-                    </>
-                  }
-                  date="updated 4 min ago"
-                  chart={sales}
-                />
-              </MDBox>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <MDBox mb={3}>
-                <ReportsLineChart
-                  color="dark"
-                  title="completed tasks"
-                  description="Last Campaign Performance"
-                  date="just updated"
-                  chart={tasks}
-                />
-              </MDBox>
-            </Grid>
           </Grid>
+
+          <MDBox mt={4}>
+            <Grid container spacing={3}>
+              {/* Second Section: Remaining Reports */}
+              {reports.slice(3).map((report) => (
+                <Grid item xs={12} md={6} lg={4} key={report.url}>
+                  <Link to={`/report/${report.id}`} style={{ textDecoration: "none" }}>
+                    <ReportsBarChart
+                      image={coverImage} // Image path
+                      title={report.name}
+                      description={report.description}
+                      chart={reportsBarChartData}
+                      imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
+                    />
+                  </Link>
+                </Grid>
+              ))}
+            </Grid>
+          </MDBox>
         </MDBox>
         <MDBox>
           <Grid container spacing={3}>

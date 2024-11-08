@@ -47,6 +47,7 @@ import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
+import Details from "layouts/details";
 
 const routes = [
   {
@@ -65,14 +66,14 @@ const routes = [
     route: "",
     component: <Dashboard />,
   },
-  // {
-  //   type: "collapse",
-  //   name: "Tables",
-  //   key: "tables",
-  //   icon: <Icon fontSize="small">table_view</Icon>,
-  //   route: "/tables",
-  //   component: <Tables />,
-  // },
+  {
+    type: "collapse",
+    name: "All Labs",
+    key: "tables",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/labs/:name",
+    component: <Details />,
+  },
   // {
   //   type: "collapse",
   //   name: "Billing",

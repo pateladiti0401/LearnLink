@@ -29,17 +29,18 @@ import configs from "examples/Charts/BarCharts/ReportsBarChart/configs";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function ReportsBarChart({ color, title, description, date, chart }) {
-  const { data, options } = configs(chart.labels || [], chart.datasets || {});
+function ReportsBarChart({ color, image, title, description, date, chart }) {
+  // const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   return (
     <Card sx={{ height: "100%" }}>
       <MDBox padding="1rem">
         <MDBox mb={2} display="flex" justifyContent="center">
           <img
-            src="./assets/images/bg-reset-cover.jpeg" // Replace with the actual image path
+            // src="./assets/images/bg-reset-cover.jpeg"
+            src={image}
             alt="Description of image"
-            style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }} // Adjust styles as needed
+            style={{ maxWidth: "80%", height: "50%", borderRadius: "8px" }}
           />
         </MDBox>
         <MDBox pt={3} pb={1} px={1}>
@@ -49,15 +50,15 @@ function ReportsBarChart({ color, title, description, date, chart }) {
           <MDTypography component="div" variant="button" color="text" fontWeight="light">
             {description}
           </MDTypography>
-          <Divider />
-          <MDBox display="flex" alignItems="center">
+          {/* <Divider /> */}
+          {/* <MDBox display="flex" alignItems="center">
             <MDTypography variant="button" color="text" lineHeight={1} sx={{ mt: 0.15, mr: 0.5 }}>
               <Icon>schedule</Icon>
             </MDTypography>
-            <MDTypography variant="button" color="text" fontWeight="light">
+            {/* <MDTypography variant="button" color="text" fontWeight="light">
               {date}
-            </MDTypography>
-          </MDBox>
+            </MDTypography> */}
+          {/* </MDBox> */}
         </MDBox>
       </MDBox>
     </Card>
@@ -74,9 +75,10 @@ ReportsBarChart.defaultProps = {
 ReportsBarChart.propTypes = {
   color: PropTypes.oneOf(["primary", "secondary", "info", "success", "warning", "error", "dark"]),
   title: PropTypes.string.isRequired,
+  image: PropTypes.img,
   description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  date: PropTypes.string.isRequired,
-  chart: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.array, PropTypes.object])).isRequired,
+  date: PropTypes.string,
+  chart: PropTypes.objectOf(PropTypes.oneOfType([PropTypes.array, PropTypes.object])),
 };
 
 export default ReportsBarChart;
