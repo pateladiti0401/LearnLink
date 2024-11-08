@@ -19,21 +19,25 @@ import {
 import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
 import Icon from "@mui/material/Icon";
-
+import { useNavigate } from "react-router-dom";
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-
+import CoverLayout from "layouts/authentication/components/CoverLayout";
 // ReportsBarChart configurations
 import configs from "examples/Charts/BarCharts/ReportsBarChart/configs";
+import bgImage from "assets/images/bg-reset-cover.jpeg";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 function ReportsBarChart({ color, image, title, description, date, chart }) {
   // const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
+  const handleCardClick = () => {
+    navigate("/details", { state: { title, description, date, chart } });
+  };
   return (
-    <Card sx={{ height: "100%" }}>
+    <Card sx={{ height: "100%" }} onClick={handleCardClick}>
       <MDBox padding="1rem">
         <MDBox mb={2} display="flex" justifyContent="center">
           <img
@@ -42,6 +46,7 @@ function ReportsBarChart({ color, image, title, description, date, chart }) {
             alt="Description of image"
             style={{ maxWidth: "80%", height: "50%", borderRadius: "8px" }}
           />
+          {/* <CoverLayout coverHeight="1vh" image={bgImage}></CoverLayout> */}
         </MDBox>
         <MDBox pt={3} pb={1} px={1}>
           <MDTypography variant="h6" textTransform="capitalize">

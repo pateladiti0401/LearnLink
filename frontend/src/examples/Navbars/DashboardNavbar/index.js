@@ -133,7 +133,12 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 size="small"
                 disableRipple
                 color="inherit"
-                sx={navbarMobileMenu}
+                sx={{
+                  display: "block",
+                  position: "absolute",
+                  left: 0,
+                  ...navbarMobileMenu,
+                }}
                 onClick={handleMiniSidenav}
               >
                 <Icon sx={iconsStyle} fontSize="medium">
