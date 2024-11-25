@@ -1,13 +1,11 @@
-// import { Box, Grid, List, ListItem, ListItemText, Collapse, CircularProgress } from "@mui/material";
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import { Box, Grid, List, ListItem, ListItemText, Collapse, CircularProgress } from "@mui/material";
 import { ChevronRight, ExpandMore, Folder } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
+import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 
 function Details() {
   const { name } = useParams();
@@ -21,12 +19,8 @@ function Details() {
     const fetchData = async () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/labs/${name}`);
-        console.log("API Response:", response.data[name]); // To see the structure
-        if (response.data[name]) {
-          setData(response.data[name]);
-        } else {
-          throw new Error("Lab data not found");
-        }
+        console.log("API Response:", response.data); // To see the structure
+        setData(response.data);
       } catch (err) {
         console.error("Error loading data:", err);
         setError("Failed to load content.");
@@ -47,43 +41,34 @@ function Details() {
 
   const renderFolderContent = (content) => {
     if (!content) return null;
-
-    // If content is a string, render it
+    // If content is a string (e.g., readme URL), render accordingly
     if (typeof content === "string") {
-      if (content.match(/\.(mp4|webm)$/i)) {
+      if (content.endsWith(".mp4")) {
         return (
           <video controls className="w-full max-h-96">
             <source src={content} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         );
+      } else if (content.endsWith(".md")) {
+        return <ReactMarkdown>{`[View Markdown File](${content})`}</ReactMarkdown>;
+      } else {
+        return (
+          <a href={content} target="_blank" rel="noopener noreferrer">
+            {content}
+          </a>
+        );
       }
-      if (content.match(/\.(jpg|jpeg|png|gif)$/i)) {
-        return <img src={content} alt="Content" className="w-full max-h-96 object-contain" />;
-      }
-      return <ReactMarkdown>{content}</ReactMarkdown>;
     }
-
     // If content is an array, render each item
     if (Array.isArray(content)) {
       return content.map((item, index) => (
         <div key={index} className="mb-4">
-          {typeof item === "string" &&
-            (item.match(/\.(mp4|webm)$/i) ? (
-              <video controls className="w-full max-h-96">
-                <source src={item} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            ) : item.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-              <img src={item} alt={`Item ${index}`} className="w-full max-h-96 object-contain" />
-            ) : (
-              <ReactMarkdown>{item}</ReactMarkdown>
-            ))}
+          {typeof item === "string" && renderFolderContent(item)}
         </div>
       ));
     }
-
-    // If content is an object, render each value
+    // If content is an object, recursively render its keys and values
     return Object.entries(content).map(([key, value]) => (
       <div key={key} className="mb-4">
         <h3 className="text-lg font-semibold mb-2">{key}</h3>

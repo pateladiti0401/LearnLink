@@ -1,39 +1,30 @@
-// @mui material components
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import ReportsLineChart from "examples/Charts/LineCharts/ReportsLineChart";
 import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-
-// Data
-import reportsBarChartData from "layouts/dashboard/data/reportsBarChartData";
-import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
-
-// Dashboard components
-import Projects from "layouts/dashboard/components/Projects";
-import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 import coverImage from "../../assets/images/bg-reset-cover.jpeg";
 import { Link } from "react-router-dom";
 
+import TextField from "@mui/material/TextField";
+
 function Dashboard() {
-  const { sales, tasks } = reportsLineChartData;
-  const [reports, setReports] = useState([]);
+  const [repos, setRepos] = useState([]);
+  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchRepos = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/labs");
-        setReports(response.data);
+        setRepos(response.data.repos); // Updated to use the repos array
+        setFilteredRepos(response.data.repos);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -41,20 +32,35 @@ function Dashboard() {
       }
     };
 
-    fetchReports();
+    fetchRepos();
   }, []);
-
+  const handleSearch = (event) => {
+    const query = event.target.value.toLowerCase();
+    setSearchQuery(query);
+    setFilteredRepos(repos.filter((repo) => repo.toLowerCase().includes(query)));
+  };
   if (loading) {
-    // return <div>Loading...</div>; // You can add a loader or spinner here
+    return <div>Loading...</div>; // Display a loader if the API is loading
   }
 
   if (error) {
     return <div>Error: {error}</div>; // Display error if fetching fails
   }
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <MDBox py={3}>
+        <MDBox mb={3}>
+          <TextField
+            fullWidth
+            label="Search Labs"
+            variant="outlined"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </MDBox>
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
@@ -117,33 +123,54 @@ function Dashboard() {
           </Grid>
         </Grid>
         <MDBox mt={4.5}>
-          <Grid container spacing={3}>
-            {reports.slice(0, 3).map((report) => (
-              <Grid item xs={12} md={6} lg={4} key={report.url}>
-                <Link to={`/labs/${report.name}`} style={{ textDecoration: "none" }}>
+          {/* <Grid container spacing={3}>
+            {repos.slice(0, 3).map((repo, index) => (
+              <Grid item xs={12} md={6} lg={4} key={index}>
+                <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
                   <ReportsBarChart
                     image={coverImage} // Image path
-                    title={report.name}
-                    description={report.description}
-                    chart={reportsBarChartData}
+                    title={repo}
+                    description={`Details about ${repo}`}
+                    chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
                     imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
                   />
                 </Link>
               </Grid>
             ))}
-          </Grid>
-
-          <MDBox mt={4}>
+          </Grid> */}
+          <MDBox>
+            {filteredRepos.length > 0 ? (
+              <Grid container spacing={3}>
+                {filteredRepos.map((repo, index) => (
+                  <Grid item xs={12} md={6} lg={4} key={index}>
+                    <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
+                      <ReportsBarChart
+                        image={coverImage} // Image path
+                        title={repo}
+                        description={`Details about ${repo}`}
+                        chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
+                        imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
+                      />
+                    </Link>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <MDBox mt={2}>
+                <p>No labs found matching.</p>
+              </MDBox>
+            )}
+          </MDBox>
+          {/* <MDBox mt={4.5}>
             <Grid container spacing={3}>
-              {/* Second Section: Remaining Reports */}
-              {reports.slice(3).map((report) => (
-                <Grid item xs={12} md={6} lg={4} key={report.url}>
-                  <Link to={`/report/${report.id}`} style={{ textDecoration: "none" }}>
+              {filteredRepos.map((repo, index) => (
+                <Grid item xs={12} md={6} lg={4} key={index}>
+                  <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
                     <ReportsBarChart
                       image={coverImage} // Image path
-                      title={report.name}
-                      description={report.description}
-                      chart={reportsBarChartData}
+                      title={repo}
+                      description={`Details about ${repo}`}
+                      chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
                       imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
                     />
                   </Link>
@@ -151,16 +178,23 @@ function Dashboard() {
               ))}
             </Grid>
           </MDBox>
-        </MDBox>
-        <MDBox>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} lg={8}>
-              <Projects />
+          <MDBox mt={4}>
+            <Grid container spacing={3}>
+              {repos.slice(3).map((repo, index) => (
+                <Grid item xs={12} md={6} lg={4} key={index}>
+                  <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
+                    <ReportsBarChart
+                      image={coverImage} // Image path
+                      title={repo}
+                      description={`Details about ${repo}`}
+                      chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
+                      imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
+                    />
+                  </Link>
+                </Grid>
+              ))}
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <OrdersOverview />
-            </Grid>
-          </Grid>
+          </MDBox> */}
         </MDBox>
       </MDBox>
       <Footer />

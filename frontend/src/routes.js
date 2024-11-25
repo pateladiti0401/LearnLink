@@ -10,7 +10,8 @@ import SignUp from "layouts/authentication/sign-up";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
-import Details from "layouts/details";
+import NewLab from "layouts/newlab";
+//import Details from "layouts/details";
 
 const routes = [
   {
@@ -37,6 +38,15 @@ const routes = [
     route: "/labs/:name",
     component: <Details />,
   },
+  {
+    type: "collapse",
+    name: "Create new Lab",
+    key: "tables",
+    icon: <Icon fontSize="small">table_view</Icon>,
+    route: "/labs/newlab",
+    component: <NewLab />,
+  },
+
   // {
   //   type: "collapse",
   //   name: "Billing",

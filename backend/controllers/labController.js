@@ -15,20 +15,20 @@ module.exports.getAllLabs = async (req, res) => {
     const response = await githubApi.get(`/users/${process.env.GITHUB_OWNER}/repos`);
     const repos = response.data;
 
-    const labs = repos
-      .filter(repo => repo.name.startsWith('lab-'))
-      .map(repo => ({
-        name: repo.name,
-        description: repo.description,
-        url: repo.html_url
-      }));
+    // const labs = repos
+    //   .filter(repo => repo.name.startsWith('lab-'))
+    //   .map(repo => ({
+    //     name: repo.name,
+    //     description: repo.description,
+    //     url: repo.html_url
+    //   }));
 
 
-    // const labs = repos.map(repo => ({
-    //   name: repo.name,
-    //   description: repo.description,
-    //   url: repo.html_url
-    // }));
+    const labs = repos.map(repo => ({
+      name: repo.name,
+      description: repo.description,
+      url: repo.html_url
+    }));
     
 
     res.json(labs);

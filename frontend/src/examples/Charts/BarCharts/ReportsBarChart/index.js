@@ -34,7 +34,7 @@ function ReportsBarChart({ color, image, title, description, date, chart }) {
   // const { data, options } = configs(chart.labels || [], chart.datasets || {});
 
   const handleCardClick = () => {
-    navigate("/details", { state: { title, description, date, chart } });
+    // navigate("/details", { state: { title, description, date, chart } });
   };
   return (
     <Card sx={{ height: "100%" }} onClick={handleCardClick}>
