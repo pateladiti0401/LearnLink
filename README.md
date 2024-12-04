@@ -20,7 +20,7 @@ Deployment: CI/CD pipelines with GitHub Actions
 To run the LearnLink project locally, follow these steps:
 
 ### Clone the repository:
-git clone https://github.com/yourusername/learnlink.git
+https://github.com/pateladiti0401/LearnLink.git
 cd learnlink
 
 ### Install dependencies:
