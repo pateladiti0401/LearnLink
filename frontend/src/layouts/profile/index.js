@@ -8,11 +8,24 @@ import MDButton from "components/MDButton";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-
+import { useNavigate } from "react-router-dom";
+import api from "./../api";
 // Overview page components
 import Header from "layouts/profile/components/Header";
 
 function Overview() {
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      await api.get("/logout"); // Call the logout API
+      // localStorage.removeItem("token"); // Optional: Clear token from localStorage if used
+      navigate("/authentication/sign-in");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -40,7 +53,7 @@ function Overview() {
           </MDBox>
 
           <MDBox mt={3}>
-            <MDButton variant="outlined" color="secondary" fullWidth>
+            <MDButton variant="outlined" color="secondary" fullWidth onClick={handleLogout}>
               Logout
             </MDButton>
           </MDBox>

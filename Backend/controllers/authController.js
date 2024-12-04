@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+const User = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 
 // handle errors
@@ -77,7 +77,7 @@ module.exports.login_post = async (req, res) => {
     const user = await User.login(email, password)
     const token = createToken(user._id)
     res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
-    res.status(200).json({ user: user._id })
+    res.status(200).json({ user: user._id, token: token })
   } catch (err) {
     const errors = handleErrors(err)
     if (errors.email === '' && errors.password) {
@@ -87,7 +87,12 @@ module.exports.login_post = async (req, res) => {
   }
 }
 
+// module.exports.logout_get = (req, res) => {
+//   res.cookie('jwt', '', { maxAge: 1 })
+//   res.redirect('/')
+// }
 module.exports.logout_get = (req, res) => {
-  res.cookie('jwt', '', { maxAge: 1 })
-  res.redirect('/')
+  res.cookie('jwt', '', { maxAge: 1 }) // Clear the JWT cookie
+  res.status(200).json({ message: 'Successfully logged out' })
+  res.redirect('/authentication/sign-in')
 }

@@ -23,6 +23,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
+import api from "./../../api";
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -32,37 +33,56 @@ function Basic() {
   const navigate = useNavigate();
   const handleSetRememberMe = () => setRememberMe(!rememberMe);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault(); // Prevent page reload
+  //   if (password.length < 6) {
+  //     setErrorMessage("Password must be at least 6 characters long.");
+  //     return;
+  //   }
+  //   try {
+  //     const response = await axios.post("http://localhost:8000/login", {
+  //       email,
+  //       password,
+  //     });
+
+  //     if (response.status === 200) {
+  //       navigate("/dashboard");
+  //     }
+  //   } catch (error) {
+  //     if (error.response && error.response.data && error.response.data.errors) {
+  //       const { errors } = error.response.data;
+
+  //       // Display the first non-empty error message found
+  //       const messages = Object.values(errors)
+  //         .filter((msg) => msg)
+  //         .join(", ");
+
+  //       setErrorMessage(messages || "An unknown error occurred. Please try again.");
+  //     } else {
+  //       // Fallback error message if no specific error is provided
+  //       setErrorMessage("An error occurred. Please check your credentials and try again.");
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
     if (password.length < 6) {
       setErrorMessage("Password must be at least 6 characters long.");
       return;
     }
     try {
-      const response = await axios.post("http://localhost:8000/login", {
-        email,
-        password,
-      });
-
+      const response = await api.post("/login", { email, password });
+      // console.log("Response:", response);
       if (response.status === 200) {
+        console.log("Response data:", response.data);
+        localStorage.setItem("token", response.data.token); // Save token
         navigate("/dashboard");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        const { errors } = error.response.data;
-
-        // Display the first non-empty error message found
-        const messages = Object.values(errors)
-          .filter((msg) => msg)
-          .join(", ");
-
-        setErrorMessage(messages || "An unknown error occurred. Please try again.");
-      } else {
-        // Fallback error message if no specific error is provided
-        setErrorMessage("An error occurred. Please check your credentials and try again.");
-      }
+      setErrorMessage(error.response?.data?.errors?.join(", ") || "An error occurred.");
     }
   };
+
   return (
     <BasicLayout image={bgImage}>
       <Card>

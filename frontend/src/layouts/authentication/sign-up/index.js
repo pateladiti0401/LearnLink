@@ -16,6 +16,7 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 
 // Images
 import bgImage from "assets/images/bg-sign-up-cover.jpeg";
+import api from "./../../api";
 
 function Cover() {
   const [name, setName] = useState(""); // State for name
@@ -24,37 +25,54 @@ function Cover() {
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const navigate = useNavigate();
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault(); // Prevent default form submission
+  //   if (password.length < 6) {
+  //     setErrorMessage("Password must be at least 6 characters long.");
+  //     return;
+  //   }
+  //   try {
+  //     // Send the form data to your API
+  //     const response = await axios.post("http://localhost:8000/signup", {
+  //       //   name,
+  //       email,
+  //       password,
+  //     });
+
+  //     if (response.status === 201) {
+  //       navigate("/authentication/sign-in");
+  //     }
+  //   } catch (error) {
+  //     if (error.response && error.response.data && error.response.data.errors) {
+  //       const { errors } = error.response.data;
+
+  //       // Display the first non-empty error message found
+  //       const messages = Object.values(errors)
+  //         .filter((msg) => msg)
+  //         .join(", ");
+
+  //       setErrorMessage(messages || "An unknown error occurred. Please try again.");
+  //     } else {
+  //       // Fallback error message if no specific error is provided
+  //       setErrorMessage("An error occurred. Please check your credentials and try again.");
+  //     }
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     if (password.length < 6) {
       setErrorMessage("Password must be at least 6 characters long.");
       return;
     }
     try {
-      // Send the form data to your API
-      const response = await axios.post("http://localhost:8000/signup", {
-        //   name,
-        email,
-        password,
-      });
-
+      const response = await api.post("/signup", { email, password });
       if (response.status === 201) {
         navigate("/authentication/sign-in");
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        const { errors } = error.response.data;
-
-        // Display the first non-empty error message found
-        const messages = Object.values(errors)
-          .filter((msg) => msg)
-          .join(", ");
-
-        setErrorMessage(messages || "An unknown error occurred. Please try again.");
-      } else {
-        // Fallback error message if no specific error is provided
-        setErrorMessage("An error occurred. Please check your credentials and try again.");
-      }
+      console.log(error);
+      setErrorMessage(error.response?.data?.errors?.join(", ") || "An error occurred.");
     }
   };
 

@@ -1,16 +1,19 @@
 import Grid from "@mui/material/Grid";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import MDBox from "components/MDBox";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ReportsBarChart from "examples/Charts/BarCharts/ReportsBarChart";
-import ComplexStatisticsCard from "examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import coverImage from "../../assets/images/bg-reset-cover.jpeg";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import api from "./../api";
+import theme from "assets/theme";
 import TextField from "@mui/material/TextField";
+import { Box, Button, Typography, IconButton } from "@mui/material";
+import MDButton from "components/MDButton";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { useTheme } from "@mui/material/styles";
+import { CircularProgress } from "@mui/material";
 
 function Dashboard() {
   const [repos, setRepos] = useState([]);
@@ -18,11 +21,24 @@ function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+  const navigate = useNavigate();
+
+  const handleLabClick = (repo) => {
+    const isAuthenticated = !!localStorage.getItem("token"); // Check if user is authenticated
+
+    if (isAuthenticated) {
+      navigate(`/labs/${repo}`);
+    } else {
+      navigate("/authentication/sign-in");
+    }
+  };
 
   useEffect(() => {
     const fetchRepos = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/labs");
+        const response = await api.get("/api/labs");
         setRepos(response.data.repos); // Updated to use the repos array
         setFilteredRepos(response.data.repos);
       } catch (err) {
@@ -39,13 +55,84 @@ function Dashboard() {
     setSearchQuery(query);
     setFilteredRepos(repos.filter((repo) => repo.toLowerCase().includes(query)));
   };
+
   if (loading) {
-    return <div>Loading...</div>; // Display a loader if the API is loading
+    const theme = useTheme();
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh", // Full page height
+          backgroundColor: theme.palette.background.default, // Adapt background to theme
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: theme.palette.mode === "dark" ? "#fff" : "#333", // White text in dark mode
+            marginBottom: "20px",
+          }}
+        >
+          Loading, please wait...
+        </Typography>
+        <CircularProgress
+          size={60}
+          thickness={5}
+          sx={{
+            color: theme.palette.primary.main,
+          }}
+        />
+      </Box>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>; // Display error if fetching fails
+    const theme = useTheme();
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh", // Full page height
+          backgroundColor: theme.palette.background.default, // Adapt background to theme
+          padding: "20px",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            color: theme.palette.error.main, // Error color from the theme
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
+          Oops! Something went wrong.
+        </Typography>
+        <Typography
+          variant="body1"
+          sx={{
+            color: theme.palette.text.primary, // Text color adapts to theme
+            textAlign: "center",
+          }}
+        >
+          Error: {error}
+        </Typography>
+      </Box>
+    );
   }
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentRepos = filteredRepos.slice(startIndex, endIndex);
+
+  const totalPages = Math.ceil(filteredRepos.length / itemsPerPage);
 
   return (
     <DashboardLayout>
@@ -60,144 +147,141 @@ function Dashboard() {
             onChange={handleSearch}
           />
         </MDBox>
-
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="dark"
-                icon="weekend"
-                title="New Releases"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
-                }}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                icon="people"
-                title="Active Users"
-                count="1,200"
-                percentage={{
-                  color: "success",
-                  amount: "+15%",
-                  label: "than last month",
-                }}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="success"
-                icon="store"
-                title="Lessons Completed"
-                count="950"
-                percentage={{
-                  color: "success",
-                  amount: "+8%",
-                  label: "than yesterday",
-                }}
-              />
-            </MDBox>
-          </Grid>
-          <Grid item xs={12} md={6} lg={3}>
-            <MDBox mb={1.5}>
-              <ComplexStatisticsCard
-                color="primary"
-                icon="person_add"
-                title="New Sign-ups"
-                count="+91"
-                percentage={{
-                  color: "success",
-                  amount: "",
-                  label: "Just updated",
-                }}
-              />
-            </MDBox>
-          </Grid>
-        </Grid>
-        <MDBox mt={4.5}>
-          {/* <Grid container spacing={3}>
-            {repos.slice(0, 3).map((repo, index) => (
-              <Grid item xs={12} md={6} lg={4} key={index}>
-                <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
-                  <ReportsBarChart
-                    image={coverImage} // Image path
-                    title={repo}
-                    description={`Details about ${repo}`}
-                    chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
-                    imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
-                  />
-                </Link>
-              </Grid>
-            ))}
-          </Grid> */}
-          <MDBox>
-            {filteredRepos.length > 0 ? (
-              <Grid container spacing={3}>
-                {filteredRepos.map((repo, index) => (
-                  <Grid item xs={12} md={6} lg={4} key={index}>
-                    <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
-                      <ReportsBarChart
-                        image={coverImage} // Image path
-                        title={repo}
-                        description={`Details about ${repo}`}
-                        chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
-                        imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
-                      />
-                    </Link>
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <MDBox mt={2}>
-                <p>No labs found matching.</p>
-              </MDBox>
-            )}
-          </MDBox>
-          {/* <MDBox mt={4.5}>
-            <Grid container spacing={3}>
-              {filteredRepos.map((repo, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
-                    <ReportsBarChart
-                      image={coverImage} // Image path
-                      title={repo}
-                      description={`Details about ${repo}`}
-                      chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
-                      imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
-                    />
-                  </Link>
-                </Grid>
-              ))}
-            </Grid>
-          </MDBox>
-          <MDBox mt={4}>
-            <Grid container spacing={3}>
-              {repos.slice(3).map((repo, index) => (
-                <Grid item xs={12} md={6} lg={4} key={index}>
-                  <Link to={`/labs/${repo}`} style={{ textDecoration: "none" }}>
-                    <ReportsBarChart
-                      image={coverImage} // Image path
-                      title={repo}
-                      description={`Details about ${repo}`}
-                      chart={{ labels: ["Demo"], datasets: [] }} // Dummy chart data
-                      imageStyle={{ width: "100%", height: "150px", objectFit: "cover" }}
-                    />
-                  </Link>
-                </Grid>
-              ))}
-            </Grid>
-          </MDBox> */}
-        </MDBox>
       </MDBox>
-      <Footer />
+      <Grid container spacing={3} sx={{ padding: "20px" }}>
+        {currentRepos.length > 0 ? (
+          currentRepos.map((repo, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Box
+                onClick={() => handleLabClick(`${repo}`)}
+                sx={{
+                  backgroundImage: `linear-gradient(to top right, ${theme.palette.primary.main}, #000)`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundColor: "#000", // Fallback color in case the gradient isn't supported
+                  borderRadius: "12px",
+                  padding: "20px",
+                  height: "200px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)", // Initial black shadow
+                  transition:
+                    "transform 0.3s ease, background-image 0.3s ease, box-shadow 0.3s ease",
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundImage: `linear-gradient(to right, ${theme.palette.primary.main}, #000)`, // Gradient on hover using primary and secondary theme colors
+                    color: "#fff", // White text on hover
+                    transform: "scale(1.05)", // Slight zoom effect
+                    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.5)", // Darker shadow on hover
+                  },
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{
+                    color: "#fff", // White text initially
+                    fontWeight: "600",
+                    textAlign: "center",
+                    transition: "color 0.3s ease",
+                  }}
+                >
+                  {repo}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#fff", // White text initially
+                    textAlign: "center",
+                    fontSize: "0.9rem",
+                    marginTop: "8px",
+                    transition: "color 0.3s ease",
+                  }}
+                >
+                  Click to explore details
+                </Typography>
+              </Box>
+            </Grid>
+          ))
+        ) : (
+          <Typography
+            variant="h6"
+            sx={{
+              textAlign: "center",
+              color: "#aaa",
+              fontSize: "1.2rem",
+              marginTop: "20px",
+            }}
+          >
+            No Labs Found
+          </Typography>
+        )}
+        <Grid item xs={12}>
+          {/* Pagination Controls */}
+          <MDBox
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{
+              marginTop: "50px",
+              gap: "20px",
+            }}
+          >
+            {/* Previous Button */}
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              sx={{
+                minWidth: "40px",
+                minHeight: "40px",
+                borderRadius: "100%",
+                opacity: currentPage === 1 ? 0.6 : 1,
+                pointerEvents: currentPage === 1 ? "none" : "auto",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ArrowBackIosIcon fontSize="small" />
+            </MDButton>
+
+            {/* Page Information */}
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: "500",
+                color: theme.palette.mode === "dark" ? "#fff" : "#333",
+                textAlign: "center",
+              }}
+            >
+              Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+            </Typography>
+
+            {/* Next Button */}
+            <MDButton
+              variant="contained"
+              color="primary"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              sx={{
+                minWidth: "40px",
+                minHeight: "40px",
+                borderRadius: "100%",
+                opacity: currentPage === totalPages ? 0.6 : 1,
+                pointerEvents: currentPage === totalPages ? "none" : "auto",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </MDButton>
+          </MDBox>
+        </Grid>
+      </Grid>
     </DashboardLayout>
   );
 }

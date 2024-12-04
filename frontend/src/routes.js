@@ -1,18 +1,13 @@
-// Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Details from "layouts/details";
-import Billing from "layouts/billing";
-import RTL from "layouts/rtl";
-import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
-
+import LogoutDialog from "./layouts/authentication/logout";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import NewLab from "layouts/newlab";
 //import Details from "layouts/details";
-
+const isAuthenticated = !!localStorage.getItem("token");
 const routes = [
   {
     type: "collapse",
@@ -22,55 +17,23 @@ const routes = [
     route: "/dashboard",
     component: <Dashboard />,
   },
-  {
-    type: "collapse",
-    name: "My Library",
-    key: "",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "",
-    component: <Dashboard />,
-  },
-  {
-    type: "collapse",
-    name: "All Labs",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/labs/:name",
-    component: <Details />,
-  },
+  // !isAuthenticated && {
+  //   type: "collapse",
+  //   name: "All Labs",
+  //   key: "tables",
+  //   icon: <Icon fontSize="small">table_view</Icon>,
+  //   route: "/labs/:name",
+  //   component: <Details />,
+  // },
   {
     type: "collapse",
     name: "Create new Lab",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
+    key: "newlab",
+    icon: <Icon fontSize="small">receipt_long</Icon>,
     route: "/labs/newlab",
     component: <NewLab />,
   },
 
-  // {
-  //   type: "collapse",
-  //   name: "Billing",
-  //   key: "billing",
-  //   icon: <Icon fontSize="small">receipt_long</Icon>,
-  //   route: "/billing",
-  //   component: <Billing />,
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "RTL",
-  //   key: "rtl",
-  //   icon: <Icon fontSize="small">format_textdirection_r_to_l</Icon>,
-  //   route: "/rtl",
-  //   component: <RTL />,
-  // },
-  // {
-  //   type: "collapse",
-  //   name: "Notifications",
-  //   key: "notifications",
-  //   icon: <Icon fontSize="small">notifications</Icon>,
-  //   route: "/notifications",
-  //   component: <Notifications />,
-  // },
   {
     type: "collapse",
     name: "Profile",
@@ -79,7 +42,7 @@ const routes = [
     route: "/profile",
     component: <Profile />,
   },
-  {
+  !isAuthenticated && {
     type: "collapse",
     name: "Sign In",
     key: "sign-in",
@@ -87,7 +50,7 @@ const routes = [
     route: "/authentication/sign-in",
     component: <SignIn />,
   },
-  {
+  !isAuthenticated && {
     type: "collapse",
     name: "Sign Up",
     key: "sign-up",
@@ -95,6 +58,14 @@ const routes = [
     route: "/authentication/sign-up",
     component: <SignUp />,
   },
-];
+  {
+    type: "collapse",
+    name: "Logout",
+    key: "logout",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/logout",
+    component: <LogoutDialog />,
+  },
+].filter(Boolean);
 
 export default routes;
